@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Security Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>URL Security Analyzer</h1>
+        <div class="form-container">
+            <form id="urlForm" method="POST" onsubmit="return handleSubmit(event)">
+                <div class="form-group">
+                    <input type="text" name="url" id="url" placeholder="Enter URL to analyze (e.g., https://example.com)" required>
+                </div>
+                <button type="submit" class="analyze-btn" id="submitBtn">
+                    <i class="fas fa-search"></i> Analyze URL
+                </button>
+            </form>
+        </div>
+        
+        {% if result %}
+        <div class="result-container {% if result.class == 'safe' %}result-safe{% else %}result-danger{% endif %}">
+            <h2>Analysis Result</h2>
+            <div class="prediction">
+                <p>This URL appears to be: <strong>{{ result.prediction|title }}</strong></p>
+                <p class="confidence">Confidence: {{ result.confidence }}%</p>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <div class="features-header">
+                    <h3>Feature Analysis</h3>
+                    <button class="features-toggle" onclick="return toggleFeatures(event)">
+                        <i class="fas fa-chevron-down"></i> <span>Show Details</span>
+                    </button>
+                </div>
+                <div class="features-content" id="featuresContent">
+                    <div class="features-grid">
+                        {% for feature, value in result.features.items() %}
+                        <div class="feature-item">
+                            <div class="feature-name">{{ feature|replace('_', ' ')|title }}</div>
+                            <div class="feature-value {% if value is boolean %}boolean-value{% endif %}">
+                                {% if value is boolean %}
+                                    <span class="badge {{ 'badge-yes' if value else 'badge-no' }}">
+                                        {{ "Yes" if value else "No" }}
+                                    </span>
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="recommendation">
+                <h3>Security Recommendations</h3>
+                <ul class="recommendations-list">
+                    {% for rec in result.recommendations %}
+                    <li>{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error-container">
+            <p class="error-message">{{ error }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function handleSubmit(event) {
+            const submitBtn = document.getElementById('submitBtn');
+            const url = document.getElementById('url').value.trim();
+            
+            if (!url) {
+                event.preventDefault();
+                return false;
+            }
+
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            return true;
+        }
+
+        function toggleFeatures(event) {
+            event.preventDefault();
+            const content = document.getElementById('featuresContent');
+            const button = document.querySelector('.features-toggle');
+            const buttonText = button.querySelector('span');
+            const icon = button.querySelector('i');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.className = 'fas fa-chevron-down';
+                buttonText.textContent = 'Show Details';
+            } else {
+                content.classList.add('show');
+                icon.className = 'fas fa-chevron-up';
+                buttonText.textContent = 'Hide Details';
+            }
+            
+            return false;
+        }
+    </script>
+</body>
+</html> 
