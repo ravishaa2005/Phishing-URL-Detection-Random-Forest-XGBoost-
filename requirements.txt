@@ -1,4 +1,6 @@
-setuptools>=42
+pip>=23.2
+setuptools>=68.0
+wheel
 gunicorn
 flask==2.3.3
 pandas==2.0.3
