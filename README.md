@@ -60,8 +60,8 @@ python app.py
 
 | Model         | Accuracy |
 |---------------|----------|
-| Random Forest | 95.3%    |
-| XGBoost       | 96.7%    |
+| Random Forest | 93%    |
+| XGBoost       | 92%    |
 
 
 ### App Screenshots
